@@ -175,6 +175,7 @@ CREATE TABLE PersonDetail
 GO
 
 --This is a Cross-reference table
+--Last table
 IF EXISTS (SELECT * FROM sys.tables WHERE Name = 'PersonAddress')
 BEGIN
 	DROP TABLE PersonAddress
