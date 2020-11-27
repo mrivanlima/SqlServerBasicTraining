@@ -278,37 +278,196 @@ ALTER TABLE aTable
    ADD CONSTRAINT UQ_aTable_aColumnUnique UNIQUE (aColumnUnique)
 
 
---   THERE IS A SYSTEM STORED PROCEDURE CALLED SP_RENAME WHERE WE ARE ABLE TO RENAME THE NAMES OF OBJECTS INCLUDING TABLES, COLUMNS AND CONSTRAINTS.
--- wE WON'T TALK ABOUT THIS IN THIS COURSE. iT WILL BE COVERED IN A DIFFERENT COURSE.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+--Can I modify datatypes?
 
 ALTER TABLE aTable
-   ADD ColumnAdded NVARCHAR(20) NOT NULL
-
-
-   SELECT * FROM aTable
+   ALTER COLUMN aTableId BIGINT
 
 ALTER TABLE aTable
-   ALTER COLUMN aTableName NVARCHAR(40) NULL
+   ALTER COLUMN aTableName NVARCHAR(100)
+
+ALTER TABLE aTable
+   ALTER COLUMN aTableName INT
+
+-- THERE IS A SYSTEM STORED PROCEDURE CALLED SP_RENAME WHERE WE ARE ABLE TO RENAME THE NAMES OF OBJECTS INCLUDING TABLES, COLUMNS AND CONSTRAINTS.
+-- WE WON'T TALK ABOUT THIS IN THIS COURSE. iT WILL BE COVERED IN A DIFFERENT COURSE.
+
+--So, here are best practices but not mandatory.
+--For any keywords in SQL SERVER we should use capital letter (CREATE, ALTER, TABLE, etc...)
+--Table name should be singular
+--Column Names should be <tableName> Followed by Attribute. For example PersonID for a table called Person with Attribute ID.
+--Table should have audit columns always. They are CreatedBy, CreatedDate, UpdatedBy, UpdatedDate.
+--Datatypes should be well thought.
+
+
+--For any CONSTRAINT that also create a different object in the database, we should name it and follow patterns.
+--These are the patterns based on the type of CONSTRAINT
+--PRIMARY KEY CONSTRAINT PK_<TableName>_<ColumnName>(s)
+--UNIQUE KEY CONSTRAINT UQ_<TableName>_<ColumnName(s)>
+--DEFAULT CONSTRAINT DF_<TableName>_<ColumnName>
+--CHECK CONSTRAINT CHK_<TableName>_<ColumnName>
+
+
+--Data Types
+--Bit -0 or 1 - On or Off
+--Byte - 8 bits
+--1KB - 1024  Bytes
+--8KB - 8,192 Bytes
+
+
+
+--128   64   32    16   8   4   2   1 
+-- 0     0    0     0   0   0   0   0 = 0
+-- 0     0    0     0   0   0   0   1 = 1
+-- 0     0    0     0   0   0   1   0 = 2
+-- 0     0    0     0   0   0   1   1 = 3
+-- 0     0    0     0   0   1   0   0 = 4
+-- 0     0    0     0   0   1   0   1 = 5
+--                   .
+--                   .
+--                   .
+-- 1     1    1     1   1   1   1   1 = 255
+
+--256  512 1024 2048 4096 8192 16384 32768
+
+--select 256 + 512 + 1024 + 2048 + 4096 + 8192 + 16384 + 32768 + 256
+
+--Based on that we can now study datatypes. It is very important to get the right datatype for better Satabase performance.
+
+--Main Datatypes
+--Numeric
+--BIT Values(0,l NULL) --Storage (minmum 1 Byte. It will depend on how many bit columns in the table.
+--See example:
+CREATE TABLE aBitTable
+( BitColumn1 BIT
+)
+--This table has reserved 1 byte of storage. Now remember 1 byte has 8 bits so the second table has also reserved 1 byte of data.
+DROP TABLE aBitTable
+GO
+CREATE TABLE aBitTable2
+( BitColumn1 BIT
+, BitColumn2 BIT
+, BitColumn3 BIT
+, BitColumn4 BIT
+, BitColumn5 BIT
+, BitColumn6 BIT
+, BitColumn7 BIT
+, BitColumn8 BIT
+)
+--In other words if there are from1 to 8 columns of the BIT datatype, the table will reserve 1 byte for those columns. If there are more
+-- BIT columns, the table will add another byte per 8 more bits. So If there are from 9 BIT columns to 16 there will be 2 bytes if there are
+-- 17 Bit columns to 24 there will 3 bytes and so forth.
+--Many developers belive that a BIT will only take 1 BIT of storage in SQL Server, but that is not he case the minimum amount is 1 byte.
+
+DROP TABLE aBitTable2
 GO
 
+--TINYINT Values(0 to 255) --Storage (1 byte)  -- These values are good to know for interviews.
+--SMALLINT Values(-32,768 to 32,767) --Sorage(2 bytes) --These values are good to know for interviews.
+--INT Values(-2147,483,648 to 2,147,483,647) --Storage (4 bytes) -- The bytes are good to know.
+--BIGINT Values(-2^63 to 2^63 -1) --Storage(8 bytes) -- The bytes are good to know.
+--DECIMAL OR NUMERIC --Storage(5 bytes to 13 bytes) -- It will depend on the precision.
+--MONEY --Storage (8 bytes)
+--SMALLMONEY --Storage (4 bytes)
 
-ALTER TABLE aTable
-ALTER COLUMN aTableName DROP DEFAULT
+--Thse were the main numeric types. Lets now check some date types.
+--DATETIME --Storage (8 bytes)
+--SMALLDATETIME -- Stoorage (4 bytes)
+--DATE --Storage (3 bytes)
+--DATETIME2 --Storage (6 to 8 bytes)
+
+--These were the main date datatypes. Let's see now string datatypes.
+--CHAR --Storage ( 1 byte to 8000 bytes). It takes 1 byte per character. If CAHR(100) is definied it means it will take 100 bytes no matter what.
+--NCHAR --Storage (1 byte to 8000 bytes). It takes 2 bytes per character. If NCHAR(100) is defined, it means it will take 200 bytes no matter what.
+--VARCHAR --Storage (2 bytes + (1 to 8000 bytes)). It takes 2 bytes plus the number of charcters. If VARCHAR(100) is defined, it means it will take 102 bytes if all characters are used.
+--NVARCHAR --Storage (2 bytes + (2 to 4000 bytes)). It takes 2 bytes plus 2x the number of charcters. If NVARCHAR(100) is defined, it means it will take 202 bytes if all characters are used.
+
+--These are the ones to be found or created all the time. there are some others not very used but that can be found. 
+--They are:
+--UNIQUEIDENTIFIER
+--TIMESTAMP
+--XML
+--TABLE
+--CURSOR
+--SQL_VARIANT
+--IMAGE
+--TEXT
+--NTEXT
+--VARBINARY
+--BINARY
+--We will not worry about these for the purpose of this course.
+
+--Let's now create a table followinf all the conventions and calculate how many bytes per row that table can hold.
+--a Page holds 8,060 bytes of row data. A page has 8,192 Bytes total - 96 bytes from Page Header - OffsetArray 36 bytes.
+
+IF EXISTS(SELECT * FROM sys.tables WHERE name = 'Person')
+BEGIN
+   DROP TABLE Person
+END
+GO
+
+CREATE TABLE Person
+( PersonID INT
+, PersonFirstName VARCHAR(40) NOT NULL
+, PersonMiddleName VARCHAR(40) NULL
+, PersonLastName VARCHAR(40) NOT NULL
+, PersonDateOfBirth DATE NOT NULL
+, PersonAge TINYINT 
+, PersonGender BIT
+, PersonNickName VARCHAR(50)
+, PersonCreatedBy INT
+, PersonCreatedDate DATETIME2
+, PersonUpdatedBy INT
+, PersonUpdatedDate DATETIME2
+, CONSTRAINT PK_PersonID PRIMARY KEY (PersonID)
+, CONSTRAINT CHK_Person_PersonAge CHECK(PersonAge > 13)
+
+)
+GO
+
+ALTER TABLE Person
+   ADD CONSTRAINT DF_Person_PersonNickName DEFAULT 'None' FOR PersonNickName 
+GO
+
+--how many bytes per row? Remember that VARCHAR is dynamic, so we will calculate for the worst scenario.
+--PersonID INT - 4 bytes
+--, PersonFirstName VARCHAR(40) NOT NULL - 42 bytes
+--, PersonMiddleName VARCHAR(40) NULL -42 bytes
+--, PersonLastName VARCHAR(40) NOT NULL - 42 bytes
+--, PersonDateOfBirth DATE NOT NULL - 3 bytes
+--, PersonAge TINYINT - 1 byte
+--, PersonGender BIT - 1 byte
+--, PersonNickName VARCHAR(50) - 52 bytes
+--, PersonCreatedBy INT -4 bytes
+--, PersonCreatedDate DATETIME2 - 8 bytes
+--, PersonUpdatedBy INT - 4 bytes
+--, PersonUpdatedDate DATETIME2 - 8 bytes
+
+SELECT 4 + 42 + 42 + 42 + 3 + 1 + 1 + 52 + 4 + 8 + 4 + 8
+--211 BYTES
+
+--How many will it fit in a 8kb page?
+select 8060 / 211
+--It will fit 38 rows per page.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
