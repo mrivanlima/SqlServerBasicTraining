@@ -192,5 +192,125 @@ CREATE TABLE PersonAddress
 )
 GO
 
+--Table anatomy
+
+DROP TABLE aTable
+--DDL  --Object  --tablename --delimiter --columname --ColumnType -- Constraint --Property --seed,increment --comma
+CREATE TABLE aTable ( aTableId INT PRIMARY KEY IDENTITY (1, 1), 
+                     --columname --ColumnType -- Constraint
+                      aTableName NVARCHAR(20) NOT NULL,
+					  ColumnToBeDropped NVARCHAR(20) NULL,
+					  --columname --ColumnType -- Constraint --Value
+					  aDefaultTableColumn NVARCHAR(20) DEFAULT 'Table Cloumn',
+					  aColumnCheck INT CHECK (aColumnCheck > 10),
+					  aColumnUnique INT UNIQUE,
+					  aSecondColumnUnique INT,
+					  CONSTRAINT UC_aTableSecondColumnUnique UNIQUE (aSecondColumnUnique)
+)
+GO
+
+
+ALTER TABLE aTable
+   DROP COLUMN aTableId
+
+ALTER TABLE aTable
+   DROP COLUMN aTableName
+
+ALTER TABLE aTable
+   DROP COLUMN ColumnToBeDropped
+GO
+
+ALTER TABLE aTable
+   DROP COLUMN aDefaultTableColumn
+
+ALTER TABLE aTable
+   DROP COLUMN aColumnCheck
+
+ALTER TABLE aTable
+   DROP COLUMN aColumnUnique
+
+ALTER TABLE aTable
+   DROP COLUMN aSecondColumnUnique
+
+ALTER TABLE aTable
+   DROP CONSTRAINT PK__aTable__6A98E7A259B715E2
+
+ALTER TABLE aTable
+   DROP CONSTRAINT DF__aTable__aDefault__571DF1D5
+
+ALTER TABLE aTable
+   DROP CONSTRAINT CK__aTable__aColumnC__5812160E
+
+ALTER TABLE aTable
+   DROP CONSTRAINT UQ__aTable__1F48EF8CF1C9972E
+
+ALTER TABLE aTable
+   DROP CONSTRAINT UC_aTableSecondColumnUnique
+
+
+--Let's add them all back
+
+ALTER TABLE aTable
+  ADD aTableId INT PRIMARY KEY
+
+ALTER TABLE aTable
+   ADD aTableName NVARCHAR(20) NOT NULL
+
+ALTER TABLE aTable
+   ADD ColumnToBeDropped NVARCHAR(20)
+
+ALTER TABLE aTable
+   ADD aDefaultTableColumn NVARCHAR(20)
+
+ALTER TABLE aTable
+   ADD CONSTRAINT DF_aTable_aDefaultTableColumn DEFAULT 'A Default Table Cloumn' FOR aDefaultTableColumn
+
+ALTER TABLE aTable
+   ADD aColumnCheck INT
+
+ALTER TABLE aTable
+   ADD CONSTRAINT CK_aTable_aColumnCheck CHECK(aColumnCheck > 20)
+
+ALTER TABLE aTable
+   ADD aColumnUnique INT UNIQUE
+
+ALTER TABLE aTable
+   ADD CONSTRAINT UQ_aTable_aColumnUnique UNIQUE (aColumnUnique)
+
+
+--   THERE IS A SYSTEM STORED PROCEDURE CALLED SP_RENAME WHERE WE ARE ABLE TO RENAME THE NAMES OF OBJECTS INCLUDING TABLES, COLUMNS AND CONSTRAINTS.
+-- wE WON'T TALK ABOUT THIS IN THIS COURSE. iT WILL BE COVERED IN A DIFFERENT COURSE.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ALTER TABLE aTable
+   ADD ColumnAdded NVARCHAR(20) NOT NULL
+
+
+   SELECT * FROM aTable
+
+ALTER TABLE aTable
+   ALTER COLUMN aTableName NVARCHAR(40) NULL
+GO
+
+
+ALTER TABLE aTable
+ALTER COLUMN aTableName DROP DEFAULT
+
+
+
 
 
