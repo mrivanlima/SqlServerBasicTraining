@@ -29,10 +29,10 @@ GO
 
 --New Password 1234567890ppH
 
-REVOKE VIEW DEFINITION ON SCHEMA :: dbo TO ilima2
+GRANT VIEW DEFINITION ON SCHEMA :: dbo TO ilima2
 go
 
-REVOKE SELECT ON "dbo"."aTable" TO "ilima2"
+GRANT SELECT ON "dbo"."aTable" TO "ilima2"
 go
 
 --The following command used to work for granting permission for ALL.
@@ -129,6 +129,14 @@ GO
 
 ALTER ROLE [Junior] ADD MEMBER ilima2
 GO
+
+revoke VIEW DEFINITION ON SCHEMA :: dbo TO Junior
+
+ALTER ROLE [db_owner] ADD MEMBER Junior
+GO
+
+REVOKE CREATE FUNCTION TO Junior
+
 
 
 
